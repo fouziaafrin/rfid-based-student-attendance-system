@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import UserRegistrationForm, CustomLoginForm
 from django.contrib import messages
 from .models import User
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 
 def register_view(request):
     if request.method == 'POST':
@@ -27,11 +29,11 @@ def login_view(request):
             if user:
                 login(request, user)
                 if user.role == 'admin':
-                    return redirect('/admin-dashboard/')
+                    return redirect('admin_dashboard')
                 elif user.role == 'teacher':
-                    return redirect('/teacher-dashboard/')
+                    return redirect('teacher_dashboard')
                 else:
-                    return redirect('/student-dashboard/')
+                    return redirect('student_dashboard')
     else:
         form = CustomLoginForm()
     return render(request, 'accounts/login.html', {'form': form})
@@ -39,3 +41,26 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+# Custom role-check decorators
+def role_required(required_role):
+    def decorator(view_func):
+        def wrapper(request, *args, **kwargs):
+            if request.user.role == required_role:
+                return view_func(request, *args, **kwargs)
+            return HttpResponseForbidden("You are not authorized to view this page.")
+        return login_required(wrapper)
+    return decorator
+
+@role_required('admin')
+def admin_dashboard(request):
+    return render(request, 'accounts/admin_dashboard.html')
+
+@role_required('teacher')
+def teacher_dashboard(request):
+    return render(request, 'accounts/teacher_dashboard.html')
+
+@role_required('student')
+def student_dashboard(request):
+    return render(request, 'accounts/student_dashboard.html')
+
