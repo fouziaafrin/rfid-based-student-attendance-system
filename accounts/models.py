@@ -13,7 +13,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('role', 'admin')
+        # extra_fields.setdefault('role', 'admin')
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, 'admin', password, **extra_fields)
@@ -38,7 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['full_name', 'role']
+    REQUIRED_FIELDS = ['full_name']
 
     def __str__(self):
         return f"{self.full_name} ({self.role})"
