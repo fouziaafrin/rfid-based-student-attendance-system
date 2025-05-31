@@ -1,0 +1,13 @@
+<h2>My Students</h2>
+<ul>
+    {% for student in students %}
+        <li>
+            <a href="{% url 'student_attendance_detail' student.id %}">
+                {{ student.full_name }} ({{ student.email }})
+            </a>
+        </li>
+    {% empty %}
+        <li>No students found.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'teacher_dashboard' %}">Back to Dashboard</a>

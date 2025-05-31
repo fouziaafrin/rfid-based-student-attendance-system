@@ -5,6 +5,9 @@ from django.contrib import messages
 from .models import User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+from core.models import RFIDSession
+from attendance.models import Attendance
+from django.db.models import Q
 
 def register_view(request):
     if request.method == 'POST':
@@ -58,9 +61,48 @@ def admin_dashboard(request):
 
 @role_required('teacher')
 def teacher_dashboard(request):
-    return render(request, 'accounts/teacher_dashboard.html')
+     # Fetch RFID sessions created by this teacher
+    sessions = RFIDSession.objects.filter(teacher=request.user).order_by('-start_time')[:5]
+
+    # Fetch attendance entries for this teacher
+    attendance_records = Attendance.objects.filter(
+    class_session__course__teacher=request.user
+).order_by('-class_session__date')[:10]
+
+
+    return render(request, 'accounts/teacher_dashboard.html', {
+        'sessions': sessions,
+        'attendance_records': attendance_records,
+    })
 
 @role_required('student')
 def student_dashboard(request):
     return render(request, 'accounts/student_dashboard.html')
 
+
+@role_required('teacher')
+def student_list_for_teacher(request):
+    # Get students this teacher has marked attendance for
+    student_ids = Attendance.objects.filter(
+    class_session__course__teacher=request.user
+).values_list('student', flat=True).distinct()
+
+    students = User.objects.filter(id__in=student_ids, role='student')
+    
+    return render(request, 'accounts/student_list.html', {'students': students})
+
+
+@role_required('teacher')
+def student_attendance_detail(request, student_id):
+    student = User.objects.get(id=student_id, role='student')
+    
+    # Only show attendance the current teacher has taken
+    attendance_records = Attendance.objects.filter(
+        student=student,
+        class_session__course__teacher=request.user
+    ).order_by('-date')
+
+    return render(request, 'accounts/student_attendance_detail.html', {
+        'student': student,
+        'records': attendance_records
+    })

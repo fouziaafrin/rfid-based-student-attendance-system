@@ -1,3 +1,44 @@
 <h2>Welcome Teacher {{ request.user.full_name }}</h2>
 <p>This is your dashboard.</p>
+
+<h3>Recent RFID Sessions</h3>
+<ul>
+    {% for session in sessions %}
+        <li>
+            Started: {{ session.start_time }} |
+            Expires: {{ session.expires_at }} |
+            Active: {{ session.is_active }}
+        </li>
+    {% empty %}
+        <li>No sessions found.</li>
+    {% endfor %}
+</ul>
+
+<h3>Recent Attendance Entries</h3>
+<table border="1">
+    <tr>
+        <th>Date</th>
+        <th>Student</th>
+        <th>Status</th>
+        <th>Manual?</th>
+    </tr>
+    {% for entry in attendance_records %}
+        <tr>
+            <td>{{ entry.date }}</td>
+            <td>{{ entry.student.full_name }}</td>
+            <td>{{ entry.status }}</td>
+            <td>{{ entry.recorded_manually|yesno:"Yes,No" }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="4">No attendance records found.</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'student_list' %}">📋 View Full Attendance History by Student</a>
+
+
+<br>
+
 <a href="{% url 'logout' %}">Logout</a>

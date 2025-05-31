@@ -8,4 +8,6 @@ urlpatterns = [
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('teacher-dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
     path('student-dashboard/', views.student_dashboard, name='student_dashboard'),
+    path('my-students/', views.student_list_for_teacher, name='student_list'),
+    path('my-students/<int:student_id>/', views.student_attendance_detail, name='student_attendance_detail'),
 ]
