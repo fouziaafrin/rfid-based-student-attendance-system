@@ -1,10 +1,13 @@
-<h2>Welcome Teacher {{ request.user.full_name }}</h2>
+{% extends "base.html" %}
+{% block title %}Teacher Dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-3">Welcome Teacher {{ request.user.full_name }}</h2>
 <p>This is your dashboard.</p>
 
 <h3>Recent RFID Sessions</h3>
-<ul>
+<ul class="list-group mb-4">
     {% for session in sessions %}
-        <li>
+        <li class="list-group-item">
             Started: {{ session.start_time }} |
             Expires: {{ session.expires_at }} |
             Active: {{ session.is_active }}
@@ -15,7 +18,7 @@
 </ul>
 
 <h3>Recent Attendance Entries</h3>
-<table border="1">
+<table class="table table-striped" border="1">
     <tr>
         <th>Date</th>
         <th>Student</th>
@@ -42,3 +45,5 @@
 <br>
 
 <a href="{% url 'logout' %}">Logout</a>
+
+{% endblock %}
