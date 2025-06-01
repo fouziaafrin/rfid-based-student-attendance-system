@@ -3,11 +3,48 @@
 {% block content %}
 <h2>Register a New Student or Teacher</h2>
 
-<form method="POST" class="card p-4 shadow-sm">
+<form method="POST" class="card p-4 shadow-sm" id="registration-form">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="btn btn-success">Register User</button>
 </form>
 
-<a href="{% url 'admin_dashboard' %}" class="btn btn-link mt-3">← Back to Dashboard</a>
+<a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-link mt-3">← Back to Dashboard</a>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const roleField = document.querySelector('[name="role"]');
+    const rfidField = document.querySelector('[name="rfid_uid"]').closest('p');
+    const pinField = document.querySelector('[name="pin"]').closest('p');
+
+    const studentFields = [
+        document.querySelector('[name="class_roll"]')?.closest('p'),
+        document.querySelector('[name="exam_roll"]')?.closest('p'),
+        document.querySelector('[name="registration_no"]')?.closest('p')
+    ];
+
+    function updateFieldVisibility() {
+        const role = roleField.value;
+
+        if (role === 'admin') {
+            rfidField.style.display = 'none';
+            pinField.style.display = 'none';
+        } else if (role === 'student') {
+            rfidField.style.display = '';
+            pinField.style.display = 'none';
+        } else if (role === 'teacher') {
+            rfidField.style.display = '';
+            pinField.style.display = '';
+        }
+
+        studentFields.forEach(el => {
+            if (el) el.style.display = (role === 'student') ? '' : 'none';
+        });
+    }
+
+    roleField.addEventListener('change', updateFieldVisibility);
+    updateFieldVisibility();  // Run on page load
+});
+</script>
+
 {% endblock %}

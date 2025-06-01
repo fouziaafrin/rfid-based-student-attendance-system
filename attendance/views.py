@@ -32,7 +32,7 @@ def manual_attendance_view(request):
                     attendance.recorded_manually = True
                     attendance.save()
             messages.success(request, "Attendance recorded successfully.")
-            return redirect('teacher_dashboard')
+            return redirect('accounts:teacher_dashboard')
     else:
         form = ManualAttendanceForm(initial={'date': date.today()})
     

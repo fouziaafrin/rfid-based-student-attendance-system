@@ -13,7 +13,7 @@ def register_user_by_admin(request):
             user.is_active = True
             user.save()
             messages.success(request, f"{user.role.capitalize()} {user.full_name} registered successfully.")
-            return redirect('accounts/admin_dashboard')
+            return redirect('accounts:admin_dashboard')
     else:
         form = AdminUserRegistrationForm()
     return render(request, 'reports/register_user.html', {'form': form})

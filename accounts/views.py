@@ -18,7 +18,7 @@ def register_view(request):
             user.set_password(form.cleaned_data['password'])  # Hash the password
             user.save()
             messages.success(request, "Registration successful. You can now log in.")
-            return redirect('login')
+            return redirect('accounts:login')
     else:
         form = UserRegistrationForm()
     return render(request, 'accounts/register.html', {'form': form})
@@ -33,18 +33,18 @@ def login_view(request):
             if user:
                 login(request, user)
                 if user.role == 'admin':
-                    return redirect('admin_dashboard')
+                    return redirect('accounts:admin_dashboard')
                 elif user.role == 'teacher':
-                    return redirect('teacher_dashboard')
+                    return redirect('accounts:teacher_dashboard')
                 else:
-                    return redirect('student_dashboard')
+                    return redirect('accounts:student_dashboard')
     else:
         form = CustomLoginForm()
     return render(request, 'accounts/login.html', {'form': form})
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('accounts:login')
 
 @role_required('admin')
 def admin_dashboard(request):

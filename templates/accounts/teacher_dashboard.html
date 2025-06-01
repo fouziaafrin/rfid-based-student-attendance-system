@@ -39,11 +39,11 @@
     {% endfor %}
 </table>
 
-<a href="{% url 'student_list' %}">📋 View Full Attendance History by Student</a>
+<a href="{% url 'accounts:student_list' %}">📋 View Full Attendance History by Student</a>
 
 
 <br>
 
-<a href="{% url 'logout' %}">Logout</a>
+<a href="{% url 'accounts:logout' %}">Logout</a>
 
 {% endblock %}
