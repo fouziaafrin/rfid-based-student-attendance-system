@@ -22,5 +22,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('attendance/', include('attendance.urls')),
     path('rfid/', include('core.urls')),
+    path('reports/', include('reports.urls')),
 
 ]

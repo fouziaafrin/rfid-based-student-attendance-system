@@ -8,6 +8,7 @@ from django.http import HttpResponseForbidden
 from core.models import RFIDSession
 from attendance.models import Attendance
 from django.db.models import Q
+from accounts.decorators import role_required
 
 def register_view(request):
     if request.method == 'POST':
@@ -44,16 +45,6 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
-
-# Custom role-check decorators
-def role_required(required_role):
-    def decorator(view_func):
-        def wrapper(request, *args, **kwargs):
-            if request.user.role == required_role:
-                return view_func(request, *args, **kwargs)
-            return HttpResponseForbidden("You are not authorized to view this page.")
-        return login_required(wrapper)
-    return decorator
 
 @role_required('admin')
 def admin_dashboard(request):
