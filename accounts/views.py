@@ -89,7 +89,21 @@ def student_list_for_teacher(request):
 
     students = User.objects.filter(id__in=student_ids, role='student')
     
-    return render(request, 'accounts/student_list.html', {'students': students})
+     # Build list with attendance percentage
+    student_data = []
+    for student in students:
+        records = Attendance.objects.filter(student=student, teacher=request.user)
+        total = records.count()
+        present = records.filter(status='present').count()
+        percentage = round((present / total) * 100, 2) if total > 0 else 0
+        student_data.append({
+            'student': student,
+            'total': total,
+            'present': present,
+            'percentage': percentage,
+        })
+
+    return render(request, 'accounts/student_list.html', {'student_data': student_data})
 
 
 @role_required('teacher')
@@ -101,8 +115,15 @@ def student_attendance_detail(request, student_id):
         student=student,
         class_session__course__teacher=request.user
     ).order_by('-date')
+    
+    total = attendance_records.count()
+    present = attendance_records.filter(status='present').count()
+    percentage = round((present / total) * 100, 2) if total > 0 else 0
 
     return render(request, 'accounts/student_attendance_detail.html', {
         'student': student,
-        'records': attendance_records
+        'records': attendance_records,
+        'total': total,
+        'present': present,
+        'percentage': percentage,
     })

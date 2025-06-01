@@ -1,4 +1,9 @@
 <h2>Attendance History for {{ student.full_name }}</h2>
+
+<p><strong>Total Classes:</strong> {{ total }}</p>
+<p><strong>Present:</strong> {{ present }}</p>
+<p><strong>Attendance Percentage:</strong> {{ percentage }}%</p>
+
 <table border="1">
     <tr>
         <th>Date</th>
@@ -12,9 +17,8 @@
         <td>{{ record.recorded_manually|yesno:"Yes,No" }}</td>
     </tr>
     {% empty %}
-    <tr>
-        <td colspan="3">No records found.</td>
-    </tr>
+    <tr><td colspan="3">No records found.</td></tr>
     {% endfor %}
 </table>
+
 <a href="{% url 'student_list' %}">Back to Student List</a>

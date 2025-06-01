@@ -1,13 +1,20 @@
-<h2>My Students</h2>
-<ul>
-    {% for student in students %}
-        <li>
-            <a href="{% url 'student_attendance_detail' student.id %}">
-                {{ student.full_name }} ({{ student.email }})
-            </a>
-        </li>
+<h2>My Students - Attendance Overview</h2>
+<table border="1">
+    <tr>
+        <th>Student</th>
+        <th>Total Classes</th>
+        <th>Present</th>
+        <th>Percentage</th>
+    </tr>
+    {% for entry in student_data %}
+    <tr>
+        <td><a href="{% url 'student_attendance_detail' entry.student.id %}">{{ entry.student.full_name }}</a></td>
+        <td>{{ entry.total }}</td>
+        <td>{{ entry.present }}</td>
+        <td>{{ entry.percentage }}%</td>
+    </tr>
     {% empty %}
-        <li>No students found.</li>
+    <tr><td colspan="4">No students found.</td></tr>
     {% endfor %}
-</ul>
+</table>
 <a href="{% url 'teacher_dashboard' %}">Back to Dashboard</a>
