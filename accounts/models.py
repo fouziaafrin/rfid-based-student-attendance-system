@@ -31,6 +31,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     rfid_uid = models.CharField(max_length=50, blank=True, null=True)
     pin = models.CharField(max_length=10, blank=True, null=True)
+    
+    # Student-specific fields
+    class_roll = models.CharField(max_length=10, blank=True, null=True)
+    exam_roll = models.CharField(max_length=20, blank=True, null=True)
+    registration_no = models.CharField(max_length=30, blank=True, null=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
