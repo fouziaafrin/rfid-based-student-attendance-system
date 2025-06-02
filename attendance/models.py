@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import User
+from django.utils import timezone
 
     
     
@@ -19,6 +20,19 @@ class Course(models.Model):
     code = models.CharField(max_length=20, unique=True)  # e.g., "CSE-301"
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'})
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
+    
+    day_of_week = models.CharField(max_length=10, choices=[
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    ])
+    
+    start_time = models.TimeField()
+    end_time = models.TimeField()
 
     def __str__(self):
         return f"{self.code} - {self.name}"

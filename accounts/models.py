@@ -36,6 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class_roll = models.CharField(max_length=10, blank=True, null=True)
     exam_roll = models.CharField(max_length=20, blank=True, null=True)
     registration_no = models.CharField(max_length=30, blank=True, null=True)
+    semester = models.ForeignKey('attendance.Semester', on_delete=models.SET_NULL, null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
