@@ -65,13 +65,32 @@ class Attendance(models.Model):
         return f"{self.student.full_name} - {self.class_session} - {self.status}"
     
 class LeaveRequest(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'})
+    student = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={'role': 'student'},
+        related_name='leave_requests_as_student'
+    )
     date = models.DateField()
     reason = models.TextField()
-    status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='pending')
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('approved', 'Approved'),
+            ('rejected', 'Rejected')
+        ],
+        default='pending'
+    )
     submitted_at = models.DateTimeField(auto_now_add=True)
+    approved_by = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        limit_choices_to={'role': 'teacher'},
+        related_name='leave_requests_approved'
+    )
 
     def __str__(self):
         return f"{self.student.full_name} - {self.date} - {self.status}"
-
-    

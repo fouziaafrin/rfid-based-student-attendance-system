@@ -1,49 +1,70 @@
 {% extends "base.html" %}
 {% block title %}Teacher Dashboard{% endblock %}
+
 {% block content %}
-<h2 class="mb-3">Welcome Teacher {{ request.user.full_name }}</h2>
-<p>This is your dashboard.</p>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-3">🧑‍🏫 Welcome, {{ request.user.full_name }}</h2>
+            <p class="card-text">This is your teacher dashboard. View your recent RFID sessions, attendance entries, and manage student leave requests below.</p>
 
-<h3>Recent RFID Sessions</h3>
-<ul class="list-group mb-4">
-    {% for session in sessions %}
-        <li class="list-group-item">
-            Started: {{ session.start_time }} |
-            Expires: {{ session.expires_at }} |
-            Active: {{ session.is_active }}
-        </li>
-    {% empty %}
-        <li>No sessions found.</li>
-    {% endfor %}
-</ul>
+            <hr>
 
-<h3>Recent Attendance Entries</h3>
-<table class="table table-striped" border="1">
-    <tr>
-        <th>Date</th>
-        <th>Student</th>
-        <th>Status</th>
-        <th>Manual?</th>
-    </tr>
-    {% for entry in attendance_records %}
-        <tr>
-            <td>{{ entry.date }}</td>
-            <td>{{ entry.student.full_name }}</td>
-            <td>{{ entry.status }}</td>
-            <td>{{ entry.recorded_manually|yesno:"Yes,No" }}</td>
-        </tr>
-    {% empty %}
-        <tr>
-            <td colspan="4">No attendance records found.</td>
-        </tr>
-    {% endfor %}
-</table>
+            <h4 class="mt-4">📡 Recent RFID Sessions</h4>
+            {% if sessions %}
+            <ul class="list-group mb-4">
+                {% for session in sessions %}
+                <li class="list-group-item">
+                    <strong>Started:</strong> {{ session.start_time }} |
+                    <strong>Expires:</strong> {{ session.expires_at }} |
+                    <strong>Active:</strong> {{ session.is_active|yesno:"Yes,No" }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="alert alert-info">No sessions found.</div>
+            {% endif %}
 
-<a href="{% url 'accounts:student_list' %}">📋 View Full Attendance History by Student</a>
+            <h4 class="mt-4">📅 Recent Attendance Entries</h4>
+            {% if attendance_records %}
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Student</th>
+                            <th>Status</th>
+                            <th>Manual?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in attendance_records %}
+                        <tr>
+                            <td>{{ entry.date }}</td>
+                            <td>{{ entry.student.full_name }}</td>
+                            <td>{{ entry.status }}</td>
+                            <td>{{ entry.recorded_manually|yesno:"Yes,No" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">No attendance records found.</div>
+            {% endif %}
 
-
-<br>
-
-<a href="{% url 'accounts:logout' %}">Logout</a>
-
+            <div class="mt-4 d-flex flex-wrap gap-3">
+                <a href="{% url 'accounts:student_list' %}" class="btn btn-outline-primary">
+                    📋 View Full Attendance History by Student
+                </a>
+                <a href="{% url 'attendance:manage_leave_requests' %}" class="btn btn-outline-warning">
+                    📋 Manage Student Leave Requests
+                </a>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger">
+                    🚪 Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

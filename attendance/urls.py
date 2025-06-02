@@ -7,4 +7,7 @@ urlpatterns = [
     path('manual/', views.manual_attendance_view, name='manual_attendance'),
     path('leave/apply/', views.apply_leave_view, name='apply_leave'),
     path('leave/status/', views.view_leave_status, name='view_leave_status'),
+    path('leave/manage/', views.manage_leave_requests, name='manage_leave_requests'),
+    path('leave/approve/<int:leave_id>/', views.approve_leave, name='approve_leave'),
+    path('leave/reject/<int:leave_id>/', views.reject_leave, name='reject_leave'),
 ]

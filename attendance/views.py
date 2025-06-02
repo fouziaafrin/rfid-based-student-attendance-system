@@ -58,3 +58,28 @@ def apply_leave_view(request):
 def view_leave_status(request):
     leaves = LeaveRequest.objects.filter(student=request.user).order_by('-submitted_at')
     return render(request, 'attendance/leave_status.html', {'leaves': leaves})
+
+
+@role_required('teacher')
+def manage_leave_requests(request):
+    pending_leaves = LeaveRequest.objects.filter(status='pending').order_by('-submitted_at')
+    return render(request, 'attendance/teacher_leave_list.html', {'leaves': pending_leaves})
+
+@role_required('teacher')
+def approve_leave(request, leave_id):
+    leave = LeaveRequest.objects.get(id=leave_id)
+    leave.status = 'approved'
+    leave.approved_by = request.user
+    leave.save()
+    messages.success(request, f"Approved leave for {leave.student.full_name}")
+    return redirect('attendance:manage_leave_requests')
+
+@role_required('teacher')
+def reject_leave(request, leave_id):
+    leave = LeaveRequest.objects.get(id=leave_id)
+    leave.status = 'rejected'
+    leave.approved_by = request.user
+    leave.save()
+    messages.warning(request, f"Rejected leave for {leave.student.full_name}")
+    return redirect('attendance:manage_leave_requests')
+
