@@ -5,6 +5,8 @@ from .forms import ManualAttendanceForm
 from .models import Attendance
 from django.contrib import messages
 from datetime import date
+from .models import LeaveRequest
+from .forms import LeaveRequestForm
 
 @role_required('teacher')
 def manual_attendance_view(request):
@@ -37,3 +39,22 @@ def manual_attendance_view(request):
         form = ManualAttendanceForm(initial={'date': date.today()})
     
     return render(request, 'attendance/manual_attendance.html', {'form': form})
+
+@role_required('student')
+def apply_leave_view(request):
+    if request.method == 'POST':
+        form = LeaveRequestForm(request.POST)
+        if form.is_valid():
+            leave = form.save(commit=False)
+            leave.student = request.user
+            leave.save()
+            messages.success(request, "Leave request submitted.")
+            return redirect('attendance:view_leave_status')
+    else:
+        form = LeaveRequestForm()
+    return render(request, 'attendance/apply_leave.html', {'form': form})
+
+@role_required('student')
+def view_leave_status(request):
+    leaves = LeaveRequest.objects.filter(student=request.user).order_by('-submitted_at')
+    return render(request, 'attendance/leave_status.html', {'leaves': leaves})

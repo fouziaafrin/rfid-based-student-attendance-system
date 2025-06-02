@@ -1,3 +1,31 @@
-<h2>Welcome Student {{ request.user.full_name }}</h2>
-<p>This is your dashboard.</p>
-<a href="{% url 'accounts:logout' %}">Logout</a>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-3">🎓 Welcome, {{ request.user.full_name }}</h2>
+            <p class="card-text">This is your student dashboard. Use the options below to manage your attendance and leave requests.</p>
+
+            <div class="row mt-4">
+                <div class="col-md-4 mb-3">
+                    <a href="{% url 'attendance:apply_leave' %}" class="btn btn-primary w-100">
+                        📝 Apply for Leave
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="{% url 'attendance:view_leave_status' %}" class="btn btn-info w-100 text-white">
+                        📄 My Leave Requests
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger">
+                    🚪 Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

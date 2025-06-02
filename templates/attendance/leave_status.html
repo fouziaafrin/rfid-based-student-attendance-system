@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-4">📄 My Leave Requests</h2>
+
+            {% if leaves %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Reason</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Submitted At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for leave in leaves %}
+                            <tr>
+                                <td>{{ leave.date }}</td>
+                                <td>{{ leave.reason }}</td>
+                                <td>{{ leave.status }}</td>
+                                <td>{{ leave.submitted_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    No leave requests submitted.
+                </div>
+            {% endif %}
+
+            <div class="mt-3 d-flex gap-3">
+                <a href="{% url 'attendance:apply_leave' %}" class="btn btn-outline-primary">
+                    ➕ New Leave Request
+                </a>
+                <a href="{% url 'accounts:student_dashboard' %}" class="btn btn-secondary">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
