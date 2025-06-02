@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from accounts.views import role_required
 from .forms import ManualAttendanceForm
-from .models import Attendance
+from .models import Attendance, Semester, Course, CourseSchedule, ClassSession
 from django.contrib import messages
 from datetime import date
 from .models import LeaveRequest
-from .forms import LeaveRequestForm
+from .forms import LeaveRequestForm, SemesterForm, CourseForm, CourseScheduleForm
 
 @role_required('teacher')
 def manual_attendance_view(request):
@@ -16,23 +16,37 @@ def manual_attendance_view(request):
             date_selected = form.cleaned_data['date']
             students = form.cleaned_data['students']
             status = form.cleaned_data['status']
+            mode = form.cleaned_data['mode']
             teacher = request.user
 
-            for student in students:
-                attendance, created = Attendance.objects.get_or_create(
-                    student=student,
-                    date=date_selected,
-                    defaults={
-                        'status': status,
-                        'teacher': teacher,
-                        'recorded_manually': True
-                    }
-                )
-                if not created:
-                    attendance.status = status
-                    attendance.teacher = teacher
-                    attendance.recorded_manually = True
-                    attendance.save()
+            # Get all class sessions taught by this teacher on the selected date
+            sessions = ClassSession.objects.filter(
+                date=date_selected,
+                course_schedule__course__teacher=teacher
+            )
+
+            if not sessions.exists():
+                messages.error(request, "No class session found for the selected date.")
+                return redirect('attendance:manual_attendance')
+
+            for session in sessions:
+                for student in students:
+                    attendance, created = Attendance.objects.get_or_create(
+                        student=student,
+                        class_session=session,
+                        defaults={
+                            'status': status,
+                            'teacher': teacher,
+                            'recorded_manually': True,
+                            'mode': mode
+                        }
+                    )
+                    if not created:
+                        attendance.status = status
+                        attendance.teacher = teacher
+                        attendance.recorded_manually = True
+                        attendance.mode = mode
+                        attendance.save()
             messages.success(request, "Attendance recorded successfully.")
             return redirect('accounts:teacher_dashboard')
     else:
@@ -83,3 +97,46 @@ def reject_leave(request, leave_id):
     messages.warning(request, f"Rejected leave for {leave.student.full_name}")
     return redirect('attendance:manage_leave_requests')
 
+
+@role_required('admin')
+def add_semester(request):
+    form = SemesterForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Semester added successfully.")
+        return redirect('attendance:view_semesters')
+    return render(request, 'reports/add_semester.html', {'form': form})
+
+@role_required('admin')
+def add_course(request):
+    form = CourseForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Course added successfully.")
+        return redirect('attendance:view_courses')
+    return render(request, 'reports/add_course.html', {'form': form})
+
+@role_required('admin')
+def view_semesters(request):
+    semesters = Semester.objects.all().order_by('-order')
+    return render(request, 'reports/view_semesters.html', {'semesters': semesters})
+
+@role_required('admin')
+def view_courses(request):
+    courses = Course.objects.select_related('semester', 'teacher').order_by('semester__order')
+    return render(request, 'reports/view_courses.html', {'courses': courses})
+
+
+@role_required('admin')
+def add_course_schedule(request):
+    form = CourseScheduleForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Course schedule added.")
+        return redirect('attendance:view_course_schedules')
+    return render(request, 'reports/add_course_schedule.html', {'form': form})
+
+@role_required('admin')
+def view_course_schedules(request):
+    schedules = CourseSchedule.objects.select_related('course').order_by('course__semester__order', 'day_of_week')
+    return render(request, 'reports/view_course_schedules.html', {'schedules': schedules})

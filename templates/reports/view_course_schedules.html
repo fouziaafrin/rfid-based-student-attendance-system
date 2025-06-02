@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>All Course Schedules</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Day</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sched in schedules %}
+        <tr>
+            <td>{{ sched.course.code }} - {{ sched.course.name }}</td>
+            <td>{{ sched.day_of_week }}</td>
+            <td>{{ sched.start_time }} - {{ sched.end_time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'attendance:add_course_schedule' %}" class="btn btn-primary">➕ Add Another Schedule</a>
+<a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-link">← Back to Dashboard</a>
+{% endblock %}

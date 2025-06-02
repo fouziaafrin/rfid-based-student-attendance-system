@@ -65,7 +65,7 @@ def teacher_dashboard(request):
 
     # Fetch attendance entries for this teacher
     attendance_records = Attendance.objects.filter(
-    class_session__course__teacher=request.user
+    class_session__course_schedule__course__teacher=request.user
 ).order_by('-class_session__date')[:10]
 
 
@@ -83,7 +83,7 @@ def student_dashboard(request):
 def student_list_for_teacher(request):
     # Get students this teacher has marked attendance for
     student_ids = Attendance.objects.filter(
-    class_session__course__teacher=request.user
+    class_session__course_schedule__course__teacher=request.user
 ).values_list('student', flat=True).distinct()
 
     students = User.objects.filter(id__in=student_ids, role='student')
@@ -91,7 +91,7 @@ def student_list_for_teacher(request):
      # Build list with attendance percentage
     student_data = []
     for student in students:
-        records = Attendance.objects.filter(student=student, teacher=request.user)
+        records = Attendance.objects.filter(student=student, class_session__course_schedule__course__teacher=request.user)
         total = records.count()
         present = records.filter(status='present').count()
         percentage = round((present / total) * 100, 2) if total > 0 else 0
@@ -113,7 +113,7 @@ def student_attendance_detail(request, student_id):
     attendance_records = Attendance.objects.filter(
         student=student,
         class_session__course__teacher=request.user
-    ).order_by('-date')
+    ).order_by('-class_session__date')
     
     total = attendance_records.count()
     present = attendance_records.filter(status='present').count()

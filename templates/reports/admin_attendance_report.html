@@ -26,6 +26,7 @@
                                 <td>{{ record.teacher.full_name }}</td>
                                 <td>{{ record.status }}</td>
                                 <td>{{ record.recorded_manually|yesno:"Yes,No" }}</td>
+                                <td>{{ record.mode|title }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>

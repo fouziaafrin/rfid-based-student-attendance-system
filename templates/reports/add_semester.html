@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Add Semester</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-success">Save Semester</button>
+</form>
+<a href="{% url 'attendance:view_semesters' %}">← View All Semesters</a>
+<a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-secondary mt-3">
+                ← Back to Dashboard
+            </a>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}View Semesters{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">📅 All Semesters</h2>
+
+{% if semesters %}
+<table class="table table-bordered table-striped">
+  <thead class="table-dark">
+    <tr>
+      <th>Name</th>
+      <th>Code</th>
+      <th>Active?</th>
+      <th>Order</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for semester in semesters %}
+    <tr>
+      <td>{{ semester.name }}</td>
+      <td>{{ semester.code }}</td>
+      <td>{{ semester.is_active }}</td>
+      <td>{{ semester.order }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="alert alert-info">No semesters have been added yet.</div>
+{% endif %}
+
+<a href="{% url 'attendance:add_semester' %}" class="btn btn-primary mt-3">➕ Add New Semester</a>
+<a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-link mt-3">← Back to Dashboard</a>
+{% endblock %}

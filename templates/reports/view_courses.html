@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>All Courses</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Course Code</th><th>Name</th><th>Teacher</th><th>Semester</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for course in courses %}
+    <tr>
+      <td>{{ course.code }}</td>
+      <td>{{ course.name }}</td>
+      <td>{{ course.teacher.full_name }}</td>
+      <td>{{ course.semester.name }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="{% url 'attendance:add_course' %}" class="btn btn-primary">➕ Add New Course</a>
+<a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-link mt-3">← Back to Dashboard</a>
+{% endblock %}

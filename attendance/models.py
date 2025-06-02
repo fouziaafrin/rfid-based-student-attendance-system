@@ -20,27 +20,31 @@ class Course(models.Model):
     code = models.CharField(max_length=20, unique=True)  # e.g., "CSE-301"
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'})
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.code} - {self.name} ({self.semester.name})"
     
+class CourseSchedule(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='schedules')
     day_of_week = models.CharField(max_length=10, choices=[
+        ('Sunday', 'Sunday'),
         ('Monday', 'Monday'),
         ('Tuesday', 'Tuesday'),
         ('Wednesday', 'Wednesday'),
         ('Thursday', 'Thursday'),
         ('Friday', 'Friday'),
         ('Saturday', 'Saturday'),
-        ('Sunday', 'Sunday'),
     ])
-    
     start_time = models.TimeField()
     end_time = models.TimeField()
 
     def __str__(self):
-        return f"{self.code} - {self.name}"
+        return f"{self.course.code} on {self.day_of_week} ({self.start_time}-{self.end_time})"
 
     
 
 class ClassSession(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    course_schedule = models.ForeignKey(CourseSchedule, on_delete=models.CASCADE)
     date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
@@ -48,15 +52,18 @@ class ClassSession(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.course.code} on {self.date} from {self.start_time} to {self.end_time}"
+        return f"{self.course_schedule.course.code} on {self.date} ({self.course_schedule.day_of_week}) from {self.start_time} to {self.end_time}"
 
 class Attendance(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='student_attendance')
-    # teacher = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, limit_choices_to={'role': 'teacher'}, related_name='teacher_attendance')
-    # date = models.DateField()
     class_session = models.ForeignKey(ClassSession, on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=[('present', 'Present'), ('absent', 'Absent')])
     recorded_manually = models.BooleanField(default=True)
+    mode = models.CharField(
+        max_length=20,
+        choices=[('rfid', 'RFID'), ('manual_in_person', 'Manual - In Person'), ('manual_online', 'Manual - Online')],
+        default='rfid'
+    )
 
     class Meta:
         unique_together = ('student', 'class_session')
@@ -91,6 +98,9 @@ class LeaveRequest(models.Model):
         limit_choices_to={'role': 'teacher'},
         related_name='leave_requests_approved'
     )
+    class Meta:
+        unique_together = ('student', 'date')
+
 
     def __str__(self):
         return f"{self.student.full_name} - {self.date} - {self.status}"

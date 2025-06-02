@@ -1,9 +1,22 @@
-<h2>Manual Attendance Entry</h2>
+{% extends "base.html" %}
+{% block title %}Manual Attendance Entry{% endblock %}
 
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit Attendance</button>
-</form>
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-4">📝 Manual Attendance Entry</h2>
+            <p class="card-text">Fill out the form below to manually record attendance.</p>
 
-<a href="{% url 'accounts:teacher_dashboard' %}">Back to Dashboard</a>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-primary">✅ Submit Attendance</button>
+                <a href="{% url 'accounts:teacher_dashboard' %}" class="btn btn-secondary ms-2">🔙 Back to Dashboard</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
