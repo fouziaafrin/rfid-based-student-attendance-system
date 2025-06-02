@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-4">📊 Full Attendance Records</h2>
+
+            {% if records %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Student</th>
+                                <th scope="col">Teacher</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Manual?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in records %}
+                            <tr>
+                                <td>{{ record.date }}</td>
+                                <td>{{ record.student.full_name }}</td>
+                                <td>{{ record.teacher.full_name }}</td>
+                                <td>{{ record.status }}</td>
+                                <td>{{ record.recorded_manually|yesno:"Yes,No" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    No attendance records found.
+                </div>
+            {% endif %}
+
+            <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-secondary mt-3">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

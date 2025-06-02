@@ -1,4 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from accounts.models import User
+from attendance.models import Attendance
 from .forms import AdminUserRegistrationForm
 from django.contrib import messages
 from accounts.decorators import role_required
@@ -17,3 +20,21 @@ def register_user_by_admin(request):
     else:
         form = AdminUserRegistrationForm()
     return render(request, 'reports/register_user.html', {'form': form})
+
+
+@role_required('admin')
+def admin_student_list(request):
+    students = User.objects.filter(role='student')
+    return render(request, 'reports/admin_student_list.html', {'students': students})
+
+@role_required('admin')
+def admin_teacher_list(request):
+    teachers = User.objects.filter(role='teacher')
+    return render(request, 'reports/admin_teacher_list.html', {'teachers': teachers})
+
+
+@role_required('admin')
+def admin_attendance_report(request):
+    records = Attendance.objects.select_related('class_session').all().order_by('-class_session__date')
+
+    return render(request, 'reports/admin_attendance_report.html', {'records': records})

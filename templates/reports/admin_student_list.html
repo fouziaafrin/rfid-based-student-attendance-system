@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-4">👩‍🎓 All Students</h2>
+
+            {% if students %}
+                <ul class="list-group mb-4">
+                    {% for student in students %}
+                        <li class="list-group-item">
+                            <strong>{{ student.full_name }}</strong> – {{ student.email }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    No students found.
+                </div>
+            {% endif %}
+
+            <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-secondary">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

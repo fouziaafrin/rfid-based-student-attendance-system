@@ -48,7 +48,15 @@ def logout_view(request):
 
 @role_required('admin')
 def admin_dashboard(request):
-    return render(request, 'accounts/admin_dashboard.html')
+    student_count = User.objects.filter(role='student').count()
+    teacher_count = User.objects.filter(role='teacher').count()
+    attendance_count = Attendance.objects.count()
+    
+    return render(request, 'accounts/admin_dashboard.html',{
+        'student_count': student_count,
+        'teacher_count': teacher_count,
+        'attendance_count': attendance_count, 
+    })
 
 @role_required('teacher')
 def teacher_dashboard(request):
