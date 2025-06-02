@@ -13,6 +13,7 @@ from django.utils import timezone
 def start_session(request):
     uid = request.data.get('uid')
     pin = request.data.get('pin')
+    selected_course_id = request.data.get('course_id')
 
     try:
         teacher = User.objects.get(rfid_uid=uid, role='teacher')
@@ -23,31 +24,64 @@ def start_session(request):
         weekday = now.strftime('%A')
         current_time = now.time()
 
-        # Find matching course
-        course = Course.objects.filter(
+        # If course is already selected by teacher (step 2)
+        if selected_course_id:
+            try:
+                course = Course.objects.get(id=selected_course_id, teacher=teacher)
+            except Course.DoesNotExist:
+                return Response({'status': 'error', 'message': 'Invalid course selection'})
+
+            session = ClassSession.objects.create(
+                course=course,
+                teacher=teacher
+            )
+            return Response({
+                'status': 'success',
+                'session_id': session.id,
+                'course': course.code,
+                'semester': course.semester.name,
+                'start_time': str(session.start_time),
+            })
+
+        # Step 1: Try to auto-detect possible classes
+        possible_courses = Course.objects.filter(
             teacher=teacher,
             day_of_week=weekday,
             start_time__lte=current_time,
             end_time__gte=current_time,
             semester__start_date__lte=now.date(),
             semester__end_date__gte=now.date()
-        ).first()
-
-        if not course:
-            return Response({'status': 'error', 'message': 'No scheduled class at this time'})
-
-        # Create ClassSession
-        session = ClassSession.objects.create(
-            course=course,
-            teacher=teacher
         )
 
+        if not possible_courses.exists():
+            return Response({'status': 'error', 'message': 'No scheduled class at this time'})
+
+        if possible_courses.count() == 1:
+            # One match → auto-create
+            course = possible_courses.first()
+            session = ClassSession.objects.create(course=course, teacher=teacher)
+            return Response({
+                'status': 'success',
+                'session_id': session.id,
+                'course': course.code,
+                'semester': course.semester.name,
+                'start_time': str(session.start_time),
+            })
+
+        # Multiple matches → ask teacher to select
+        course_options = [{
+            'id': c.id,
+            'code': c.code,
+            'name': c.name,
+            'semester': c.semester.name,
+            'start_time': str(c.start_time),
+            'end_time': str(c.end_time),
+        } for c in possible_courses]
+
         return Response({
-            'status': 'success',
-            'session_id': session.id,
-            'course': course.code,
-            'semester': course.semester.name,
-            'start_time': str(session.start_time),
+            'status': 'choose_course',
+            'message': 'Multiple matching courses found. Please select one.',
+            'options': course_options
         })
 
     except User.DoesNotExist:
