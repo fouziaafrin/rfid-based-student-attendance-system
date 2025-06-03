@@ -19,15 +19,32 @@ def manual_attendance_view(request):
             mode = form.cleaned_data['mode']
             teacher = request.user
 
-            # Get all class sessions taught by this teacher on the selected date
-            sessions = ClassSession.objects.filter(
-                date=date_selected,
-                course_schedule__course__teacher=teacher
+            weekday = date_selected.strftime('%A')  # e.g. 'Monday'
+
+            # Get the teacher’s scheduled courses on that weekday
+            schedules = CourseSchedule.objects.filter(
+                course__teacher=teacher,
+                day_of_week=weekday
             )
 
-            if not sessions.exists():
-                messages.error(request, "No class session found for the selected date.")
+            if not schedules.exists():
+                messages.error(request, f"No scheduled classes found for {weekday}.")
                 return redirect('attendance:manual_attendance')
+
+            # Create ClassSession(s) if they don’t already exist for the date
+            sessions = []
+            for schedule in schedules:
+                session, created = ClassSession.objects.get_or_create(
+                    course_schedule=schedule,
+                    date=date_selected,
+                    defaults={
+                        'start_time': schedule.start_time,
+                        'end_time': schedule.end_time,
+                        'started_by': teacher,
+                        'is_active': True
+                    }
+                )
+                sessions.append(session)
 
             for session in sessions:
                 for student in students:
@@ -36,17 +53,16 @@ def manual_attendance_view(request):
                         class_session=session,
                         defaults={
                             'status': status,
-                            'teacher': teacher,
                             'recorded_manually': True,
                             'mode': mode
                         }
                     )
                     if not created:
                         attendance.status = status
-                        attendance.teacher = teacher
                         attendance.recorded_manually = True
                         attendance.mode = mode
                         attendance.save()
+
             messages.success(request, "Attendance recorded successfully.")
             return redirect('accounts:teacher_dashboard')
     else:

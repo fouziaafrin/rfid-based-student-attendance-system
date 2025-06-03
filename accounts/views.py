@@ -112,7 +112,7 @@ def student_attendance_detail(request, student_id):
     # Only show attendance the current teacher has taken
     attendance_records = Attendance.objects.filter(
         student=student,
-        class_session__course__teacher=request.user
+        class_session__course_schedule__course__teacher=request.user
     ).order_by('-class_session__date')
     
     total = attendance_records.count()

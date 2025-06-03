@@ -21,9 +21,9 @@
                         <tbody>
                             {% for record in records %}
                             <tr>
-                                <td>{{ record.date }}</td>
+                                <td>{{ record.class_session.date }}</td>
                                 <td>{{ record.student.full_name }}</td>
-                                <td>{{ record.teacher.full_name }}</td>
+                                <td>{{ record.class_session.course_schedule.course.teacher.full_name }}</td>
                                 <td>{{ record.status }}</td>
                                 <td>{{ record.recorded_manually|yesno:"Yes,No" }}</td>
                                 <td>{{ record.mode|title }}</td>

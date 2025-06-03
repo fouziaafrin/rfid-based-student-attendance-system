@@ -1,20 +1,43 @@
-<h2>My Students - Attendance Overview</h2>
-<table border="1">
-    <tr>
-        <th>Student</th>
-        <th>Total Classes</th>
-        <th>Present</th>
-        <th>Percentage</th>
-    </tr>
-    {% for entry in student_data %}
-    <tr>
-        <td><a href="{% url 'student_attendance_detail' entry.student.id %}">{{ entry.student.full_name }}</a></td>
-        <td>{{ entry.total }}</td>
-        <td>{{ entry.present }}</td>
-        <td>{{ entry.percentage }}%</td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="4">No students found.</td></tr>
-    {% endfor %}
-</table>
-<a href="{% url 'accounts:teacher_dashboard' %}">Back to Dashboard</a>
+{% extends "base.html" %}
+{% block title %}Attendance Overview{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-4">📊 My Students - Attendance Overview</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student</th>
+                            <th>Total Classes</th>
+                            <th>Present</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in student_data %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'accounts:student_attendance_detail' entry.student.id %}">
+                                    {{ entry.student.full_name }}
+                                </a>
+                            </td>
+                            <td>{{ entry.total }}</td>
+                            <td>{{ entry.present }}</td>
+                            <td>{{ entry.percentage }}%</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No students found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <a href="{% url 'accounts:teacher_dashboard' %}" class="btn btn-secondary mt-3">🔙 Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

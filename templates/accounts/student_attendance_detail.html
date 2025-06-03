@@ -1,24 +1,45 @@
-<h2>Attendance History for {{ student.full_name }}</h2>
+{% extends "base.html" %}
+{% block title %}Attendance History - {{ student.full_name }}{% endblock %}
 
-<p><strong>Total Classes:</strong> {{ total }}</p>
-<p><strong>Present:</strong> {{ present }}</p>
-<p><strong>Attendance Percentage:</strong> {{ percentage }}%</p>
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-4">📅 Attendance History for {{ student.full_name }}</h2>
 
-<table border="1">
-    <tr>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Manual?</th>
-    </tr>
-    {% for record in records %}
-    <tr>
-        <td>{{ record.date }}</td>
-        <td>{{ record.status }}</td>
-        <td>{{ record.recorded_manually|yesno:"Yes,No" }}</td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="3">No records found.</td></tr>
-    {% endfor %}
-</table>
+            <ul class="list-group mb-4">
+                <li class="list-group-item"><strong>Total Classes:</strong> {{ total }}</li>
+                <li class="list-group-item"><strong>Present:</strong> {{ present }}</li>
+                <li class="list-group-item"><strong>Attendance Percentage:</strong> {{ percentage }}%</li>
+            </ul>
 
-<a href="{% url 'accounts:student_list' %}">Back to Student List</a>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Manual?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ record.class_session.date }}</td>
+                            <td>{{ record.status }}</td>
+                            <td>{{ record.recorded_manually|yesno:"Yes,No" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">No records found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <a href="{% url 'accounts:student_list' %}" class="btn btn-secondary mt-3">🔙 Back to Student List</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
