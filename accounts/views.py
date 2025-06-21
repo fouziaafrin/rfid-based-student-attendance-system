@@ -9,6 +9,8 @@ from core.models import RFIDSession
 from attendance.models import Attendance, CourseSchedule
 from django.db.models import Q
 from accounts.decorators import role_required
+from collections import defaultdict
+from django.utils.timezone import localtime
 
 def register_view(request):
     if request.method == 'POST':
@@ -131,6 +133,23 @@ def student_attendance_detail(request, student_id):
 @role_required('teacher')
 def teacher_weekly_schedule(request):
     schedules = CourseSchedule.objects.filter(course__teacher=request.user).order_by('day_of_week', 'start_time')
+    
+    # Define the time slots (hour-based blocks)
+    hour_blocks = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00']
+    
+     # Prepare data structure: schedule_map[day][hour] = list of schedules
+    schedule_map = defaultdict(lambda: defaultdict(list))
+    for schedule in schedules:
+        start_hour = schedule.start_time.strftime('%H:00')
+        schedule_map[schedule.day_of_week][start_hour].append(schedule)
+
+    context = {
+        'schedules': schedules,
+        'days': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        'hour_blocks': hour_blocks,
+        'schedule_map': dict(schedule_map),
+    }
+    
     return render(request, 'accounts/teacher_schedule.html', {'schedules': schedules})
 
 @role_required('student')
