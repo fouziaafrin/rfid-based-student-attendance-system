@@ -1,0 +1,29 @@
+<h2>Weekly Class Schedule</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Day</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Course</th>
+            {% if user.role == 'teacher' %}
+            <th>Semester</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for schedule in schedules %}
+        <tr>
+            <td>{{ schedule.day_of_week }}</td>
+            <td>{{ schedule.start_time }}</td>
+            <td>{{ schedule.end_time }}</td>
+            <td>{{ schedule.course.name }} ({{ schedule.course.code }})</td>
+            {% if user.role == 'teacher' %}
+            <td>{{ schedule.course.semester.name }}</td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No schedules found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>

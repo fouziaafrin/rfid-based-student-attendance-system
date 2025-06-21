@@ -6,7 +6,7 @@ from .models import User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from core.models import RFIDSession
-from attendance.models import Attendance
+from attendance.models import Attendance, CourseSchedule
 from django.db.models import Q
 from accounts.decorators import role_required
 
@@ -126,3 +126,15 @@ def student_attendance_detail(request, student_id):
         'present': present,
         'percentage': percentage,
     })
+
+
+@role_required('teacher')
+def teacher_weekly_schedule(request):
+    schedules = CourseSchedule.objects.filter(course__teacher=request.user).order_by('day_of_week', 'start_time')
+    return render(request, 'accounts/teacher_schedule.html', {'schedules': schedules})
+
+@role_required('student')
+def student_weekly_schedule(request):
+    semester = request.user.semester
+    schedules = CourseSchedule.objects.filter(course__semester=semester).order_by('day_of_week', 'start_time')
+    return render(request, 'accounts/student_schedule.html', {'schedules': schedules})
